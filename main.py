@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import simpledialog, ttk
 from PIL import ImageGrab, ImageTk
 import time
+import datetime
 import threading
 
 
@@ -118,7 +119,8 @@ class App:
             count += 1
             bbox = (self.start_x, self.start_y, self.end_x, self.end_y)
             screenshot = ImageGrab.grab(bbox)
-            screenshot.save(f"screenshot_{count}.png", "PNG")
+            current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            screenshot.save(f"{count}_{current_time}.png", "PNG")
             time.sleep(freq)
 
     def stop_screenshot(self):
