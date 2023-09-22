@@ -1,3 +1,4 @@
+import os.path
 import tkinter as tk
 from tkinter import simpledialog, ttk
 from PIL import ImageGrab, ImageTk
@@ -115,12 +116,14 @@ class App:
 
     def take_screenshot(self, freq):
         count = 0
+        if not os.path.exists("out"):
+            os.makedirs("out")
         while self.is_running:
             count += 1
             bbox = (self.start_x, self.start_y, self.end_x, self.end_y)
             screenshot = ImageGrab.grab(bbox)
             current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            screenshot.save(f"{count}_{current_time}.png", "PNG")
+            screenshot.save(f"out/{count}_{current_time}.png", "PNG")
             time.sleep(freq)
 
     def stop_screenshot(self):
