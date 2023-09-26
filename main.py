@@ -35,6 +35,11 @@ class App:
         self.stop_button = ttk.Button(root, text="Stop", command=self.stop_screenshot)
         self.stop_button.pack(pady=10)
 
+        self.countdown_var = tk.StringVar()
+        self.countdown_var.set("Next screenshot in: --")
+        self.countdown_label = ttk.Label(root, textvariable=self.countdown_var)
+        self.countdown_label.pack(pady=10)
+
         self.screenshot_thread = None
         self.is_running = False
 
@@ -119,16 +124,47 @@ class App:
         if not os.path.exists("out"):
             os.makedirs("out")
         while self.is_running:
+            self.update_countdown(freq)
             count += 1
             bbox = (self.start_x, self.start_y, self.end_x, self.end_y)
             screenshot = ImageGrab.grab(bbox)
             current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
             screenshot.save(f"out/{count}_{current_time}.png", "PNG")
+            self.countdown_var.set(f"Next screenshot in: --")
             time.sleep(freq)
 
     def stop_screenshot(self):
         self.is_running = False
         self.screenshot_thread = None
+        self.countdown_var.set("Next screenshot in: --")
+
+    def update_countdown(self, freq):
+        if not self.is_running:
+            return
+
+        total_seconds = int(freq)
+        hours = total_seconds // 3600
+        total_seconds %= 3600
+        minutes = total_seconds // 60
+        seconds = total_seconds % 60
+
+        while hours > 0 or minutes > 0 or seconds > 0:
+            if not self.is_running:
+                break
+
+            # Update countdown label
+            self.countdown_var.set(f"Next screenshot in: {hours:02}:{minutes:02}:{seconds:02}")
+
+            # Decrement the countdown
+            time.sleep(1)
+            seconds -= 1
+
+            if seconds < 0:
+                seconds = 59
+                minutes -= 1
+                if minutes < 0:
+                    minutes = 59
+                    hours -= 1
 
 
 if __name__ == "__main__":
